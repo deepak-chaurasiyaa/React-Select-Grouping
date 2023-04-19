@@ -2,29 +2,28 @@ import { useState } from 'react';
 import Select from 'react-select';
 import { SELECTED_DATA, SELECT_DATA } from './shared/data';
 import { Formik, Form } from 'formik';
+const options = [];
+
+SELECT_DATA.forEach((item) => {
+  const group = {
+    label: item.unitType,
+    options: item.unitTypeTitle.map((subItem) => {
+      return {
+        label: subItem.name,
+        value: subItem.id,
+      };
+    }),
+  };
+  options.push(group);
+});
+
+const unitTypeList = SELECTED_DATA.unitTypeList.map((item) => ({
+  label: item.auditTypeName,
+  value: item.auditTypeId,
+}));
 
 const App = () => {
-  const options = [];
-
-  SELECT_DATA.forEach((item) => {
-    const group = {
-      label: item.unitType,
-      options: item.unitTypeTitle.map((subItem) => {
-        return {
-          label: subItem.name,
-          value: subItem.id,
-        };
-      }),
-    };
-    options.push(group);
-  });
-
-  const unitTypeList = SELECTED_DATA.unitTypeList.map((item) => ({
-    label: item.auditTypeName,
-    value: item.auditTypeId,
-  }));
-
-  const [selectedOptions, setSelectedOptions] = useState(unitTypeList); // remove the spread operator here
+  const [selectedOptions, setSelectedOptions] = useState(unitTypeList); 
 
   const handleChange = (selected) => {
     setSelectedOptions(selected);
