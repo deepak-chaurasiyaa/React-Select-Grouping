@@ -1,57 +1,84 @@
 import { useState } from 'react';
 import Select from 'react-select';
-const options = [
-  {
-    label: 'Subsidiary',
-    options: [
-      { label: 'EDB', value: 4 },
-      { label: 'Call Center', value: 5 },
-      { label: 'sub - title1', value: 11 },
-      { label: 'fdsd', value: 12 },
-      { label: 'dsfdsf', value: 15 },
-      { label: 'sss', value: 17 },
-      { label: 'Division', value: 18 },
-      { label: 'Sandeep', value: 19 },
-    ],
-  },
-  {
-    label: 'Division',
-    options: [
-      { label: 'Food', value: 3 },
-      { label: 'ABC 11', value: 9 },
-      { label: 'asdasd', value: 13 },
-    ],
-  },
-];
+import { SELECTED_DATA, SELECT_DATA } from './shared/data';
+import { Formik, Form } from 'formik';
 
 const App = () => {
-  const data = {
-    unitTypeList: [
-      {
-        auditTypeId: 3,
-        auditTypeName: 'Food',
-        auditType: 'Division',
-      },
-    ],
-  };
-  const unitTypeList = data.unitTypeList.map((item) => ({
+  const options = [];
+
+  SELECT_DATA.forEach((item) => {
+    const group = {
+      label: item.unitType,
+      options: item.unitTypeTitle.map((subItem) => {
+        return {
+          label: subItem.name,
+          value: subItem.id,
+        };
+      }),
+    };
+    options.push(group);
+  });
+
+  const unitTypeList = SELECTED_DATA.unitTypeList.map((item) => ({
     label: item.auditTypeName,
     value: item.auditTypeId,
   }));
-  const [selectedOptions, setSelectedOptions] = useState(...unitTypeList);
+
+  const [selectedOptions, setSelectedOptions] = useState(unitTypeList); // remove the spread operator here
+
   const handleChange = (selected) => {
     setSelectedOptions(selected);
   };
+
+  const initialValues = { division_select: unitTypeList.map((el) => el.value) };
+
+  const handleContinue = (values) => {
+    console.log({ values });
+  };
+
   return (
-    <Select
-      options={options}
-      groupBy={(option) => option.unitType}
-      formatGroupLabel={(group) => <strong>{group.label}</strong>}
-      value={selectedOptions}
-      onChange={(selected) => handleChange(selected)}
-      isMulti
-      isClearable
-    />
+    <Formik initialValues={initialValues} onSubmit={handleContinue}>
+      {({ values, errors, touched, isValid, isSubmitting, setFieldValue }) => {
+        return (
+          <Form>
+            {console.log(values)}
+            <Select
+              name='division_select'
+              options={options}
+              groupBy={(option) => option.unitType}
+              formatGroupLabel={(group) => <strong>{group.label}</strong>}
+              value={selectedOptions}
+              onChange={(selected) => handleChange(selected)}
+              isMulti
+              isClearable
+            />
+            <Select
+              name='any_select'
+              options={options}
+              groupBy={(option) => option.unitType}
+              formatGroupLabel={(group) => <strong>{group.label}</strong>}
+              value={
+                values.division_select.includes(3)
+                  ? [
+                      {
+                        value: 12,
+                        label: 'fdsdeeepakkkk',
+                      },
+                    ]
+                  : []
+              }
+              onChange={(selected) => handleChange(selected)}
+              isMulti
+              isClearable
+            />
+            <button type='submit' onSubmit={(e) => handleContinue(e)}>
+              Continue
+            </button>
+          </Form>
+        );
+      }}
+    </Formik>
   );
 };
+
 export default App;
